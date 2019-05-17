@@ -4,7 +4,12 @@
 
 An ergonomic, strongly typed CouchDB client in Rust.
 
-This library includes both synchronous and asynchronous APIs for the programmer who wants it all
+This library includes both synchronous and asynchronous APIs for the programmer who wants to have it all.
+
+Couldn't find a decent, maintained CouchDB client in Rust. Also I wanted async. So i rolled my own.
+
+This is still in active development, in the sense that I add things when I need them, and fix bugs when they affect
+me directly. Would be thrilled to have a couple more sets of eyes and keyboards chipping away at this. climb aboard.
 
 ### Synchronous
 
@@ -30,7 +35,7 @@ match database
 
 ```
 
-### Asynchronous
+### Asynchronous ("ooh fancy")
 ```rust
 use chesterfield::{Error, r#async::Client, GetResponse};
 use serde::Deserialize;
@@ -76,6 +81,6 @@ cargo contribute
 
 ---
 
-Current version: 0.1.0
+Current version: 0.0.0
 
 License: apache-2.0

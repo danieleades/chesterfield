@@ -32,6 +32,10 @@ pub(crate) mod sync {
         pub fn post(&self) -> reqwest::RequestBuilder {
             self.http_client.post(self.url.clone())
         }
+
+        pub fn put(&self) -> reqwest::RequestBuilder {
+            self.http_client.put(self.url.clone())
+        }
     }
 }
 
@@ -68,6 +72,10 @@ pub(crate) mod r#async {
 
         pub fn post(&self) -> reqwest::r#async::RequestBuilder {
             self.http_client.post(self.url.clone())
+        }
+
+        pub fn put(&self) -> reqwest::r#async::RequestBuilder {
+            self.http_client.put(self.url.clone())
         }
 
         pub fn duplicate(&self) -> InnerClient {

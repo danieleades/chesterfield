@@ -1,6 +1,11 @@
 [package]
 name = "chesterfield"
-version = "0.1.0"
+description = "Ergonomic, strongly-typed CouchDB client in pure Rust."
+version = "0.0.0"
+homepage = "https://github.com/danieleades/chesterfield"
+readme = "README.md"
+keywords = ["couchdb", "nosql", "database", "pouchdb", "couchbase"]
+categories = ["api-bindings", "asynchronous", "database", "database-implementations"]
 authors = ["Daniel Eades <danieleades@hotmail.com>"]
 edition = "2018"
 license = "apache-2.0"

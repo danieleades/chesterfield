@@ -1,10 +1,12 @@
 mod get;
 mod insert;
-pub use self::get::GetResponse;
-pub use self::insert::InsertResponse;
+mod update;
+pub use self::{get::GetResponse, insert::InsertResponse, update::UpdateResponse};
 
 pub mod sync {
-    pub use super::{get::sync::GetRequest, insert::sync::InsertRequest};
+    pub use super::{
+        get::sync::GetRequest, insert::sync::InsertRequest, update::sync::UpdateRequest,
+    };
     use crate::inner_client::sync::InnerClient;
     use serde::Serialize;
 
@@ -28,11 +30,22 @@ pub mod sync {
         ) -> InsertRequest<T> {
             InsertRequest::new(&self.client, document, id)
         }
+
+        pub fn update<T: Serialize>(
+            &self,
+            document: T,
+            id: impl Into<String>,
+            rev: impl Into<String>,
+        ) -> UpdateRequest<T> {
+            UpdateRequest::new(&self.client, document, id, rev)
+        }
     }
 }
 
 pub mod r#async {
-    pub use super::{get::r#async::GetRequest, insert::r#async::InsertRequest};
+    pub use super::{
+        get::r#async::GetRequest, insert::r#async::InsertRequest, update::r#async::UpdateRequest,
+    };
     use crate::inner_client::r#async::InnerClient;
     use serde::Serialize;
 
@@ -55,6 +68,15 @@ pub mod r#async {
             id: impl Into<Option<String>>,
         ) -> InsertRequest<T> {
             InsertRequest::new(&self.client, document, id)
+        }
+
+        pub fn update<T: Serialize>(
+            &self,
+            document: T,
+            id: impl Into<String>,
+            rev: impl Into<String>,
+        ) -> UpdateRequest<T> {
+            UpdateRequest::new(&self.client, document, id, rev)
         }
     }
 }

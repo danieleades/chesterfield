@@ -65,7 +65,7 @@ pub mod r#async {
         ) -> impl Future<Item = GetResponse<T>, Error = Error> {
             result(self.client.join(&self.id).map_err(Error::from))
                 .and_then(move |client| client.get().query(&self.query).send().map_err(Error::from))
-                .and_then(move |mut response| response.json().map_err(Error::from))
+                .and_then(|mut response| response.json().map_err(Error::from))
         }
     }
 

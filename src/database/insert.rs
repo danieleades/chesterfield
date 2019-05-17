@@ -95,11 +95,11 @@ pub mod r#async {
                 .map_err(Error::from)
         }
     }
-
 }
 
 #[derive(Serialize)]
 pub struct InsertPayload<T> {
+    #[serde(skip_serializing_if = "Option::is_none")]
     _id: Option<String>,
     payload: T,
 }
