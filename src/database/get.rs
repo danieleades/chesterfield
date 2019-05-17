@@ -1,46 +1,90 @@
-use crate::error::Error;
-use crate::inner_client::InnerClient;
-use serde::{de::DeserializeOwned, Deserialize, Serialize};
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-pub struct GetRequest<'a> {
-    id: String,
-    client: &'a InnerClient,
-    query: GetRequestQuery,
-}
+pub mod sync {
 
-impl<'a> GetRequest<'a> {
-    pub(crate) fn new(client: &'a InnerClient, id: impl Into<String>) -> Self {
-        GetRequest {
-            id: id.into(),
-            client,
-            query: GetRequestQuery::default(),
+    use super::{GetRequestQuery, GetResponse};
+    use crate::inner_client::sync::InnerClient;
+    use crate::Error;
+    use serde::de::DeserializeOwned;
+
+    pub struct GetRequest<'a> {
+        id: String,
+        client: &'a InnerClient,
+        query: GetRequestQuery,
+    }
+
+    impl<'a> GetRequest<'a> {
+        pub(crate) fn new(client: &'a InnerClient, id: impl Into<String>) -> Self {
+            GetRequest {
+                id: id.into(),
+                client,
+                query: GetRequestQuery::default(),
+            }
+        }
+
+        pub fn send<T: DeserializeOwned>(self) -> Result<GetResponse<T>, Error> {
+            let response = self
+                .client
+                .join(&self.id)?
+                .get()
+                .query(&self.query)
+                .send()?
+                .json()?;
+            Ok(response)
         }
     }
 
-    pub fn send<T: DeserializeOwned>(&self) -> Result<GetResponse<T>, Error> {
-        let response = self
-            .client
-            .join(&self.id)?
-            .get()
-            .query(&self.query)
-            .send()?
-            .json()?;
-        Ok(response)
-    }
 }
 
-#[derive(Serialize)]
-struct GetRequestQuery {
+pub mod r#async {
+
+    use super::{GetRequestQuery, GetResponse};
+    use crate::inner_client::r#async::InnerClient;
+    use crate::Error;
+    use serde::de::DeserializeOwned;
+    use tokio::prelude::{future::result, Future};
+
+    pub struct GetRequest {
+        id: String,
+        client: InnerClient,
+        query: GetRequestQuery,
+    }
+
+    impl GetRequest {
+        pub(crate) fn new(client: &InnerClient, id: impl Into<String>) -> Self {
+            GetRequest {
+                id: id.into(),
+                client: client.duplicate(),
+                query: GetRequestQuery::default(),
+            }
+        }
+
+        pub fn send<T: DeserializeOwned>(
+            self,
+        ) -> impl Future<Item = GetResponse<T>, Error = Error> {
+            result(self.client.join(&self.id).map_err(Error::from))
+                .and_then(move |client| client.get().query(&self.query).send().map_err(Error::from))
+                .and_then(move |mut response| response.json().map_err(Error::from))
+        }
+    }
+
+}
+
+#[derive(Serialize, Clone)]
+pub struct GetRequestQuery {
     attachments: bool,
     att_encoding_info: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
     atts_since: Option<Vec<String>>,
     conflicts: bool,
     deleted_conflicts: bool,
     latest: bool,
     local_seq: bool,
     meta: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
     open_revs: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     rev: Option<String>,
     revs: bool,
     revs_info: bool,
@@ -79,10 +123,24 @@ pub struct GetResponseMeta {
 }
 
 #[derive(Deserialize)]
-pub struct GetResponse<T> {
+pub struct GetResponse<T = Value> {
     #[serde(flatten)]
     pub document: T,
 
     #[serde(flatten)]
     pub metadata: GetResponseMeta,
+}
+
+impl<T> GetResponse<T> {
+    pub fn into_inner(self) -> T {
+        self.document
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn it_works() {
+        assert_eq!(2 + 2, 4);
+    }
 }

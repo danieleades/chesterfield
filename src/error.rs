@@ -17,3 +17,19 @@ impl From<reqwest::UrlError> for Error {
         Error::Url(e)
     }
 }
+
+impl std::error::Error for Error {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match self {
+            Error::Reqwest(e) => Some(e),
+            Error::Url(e) => Some(e),
+        }
+    }
+}
+
+impl std::fmt::Display for Error {
+    // TODO
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "chesterfield error")
+    }
+}

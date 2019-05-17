@@ -4,8 +4,26 @@
 
 {{readme}}
 
-Current version: {{version}}
+## Building
+```bash
+cargo build
+```
+>*"oh my gosh so easy!"*
 
-Some additional info here
+## Running Tests
+```bash
+cargo test
+```
+>*"sham-wow!"*
+
+## Contributing
+```bash
+cargo contribute
+```
+>*"bullseye!"*
+
+---
+
+Current version: {{version}}
 
 License: {{license}}

@@ -1,20 +1,56 @@
-use crate::database::Database;
-use crate::error::{Error, UrlError};
-use crate::inner_client::InnerClient;
+pub mod sync {
 
-pub struct Client {
-    client: InnerClient,
+    use crate::database::sync::Database;
+    use crate::inner_client::sync::InnerClient;
+    use crate::{Error, UrlError};
+
+    pub struct Client {
+        client: InnerClient,
+    }
+
+    impl Client {
+        /// Create a new synchronous client.
+        ///
+        /// # Example
+        /// ```
+        /// use chesterfield::sync::Client;
+        ///
+        /// let client = Client::new("localhost:5984").unwrap();
+        /// ```
+        pub fn new(url: impl AsRef<str>) -> Result<Self, Error> {
+            let client = InnerClient::new(url)?;
+
+            Ok(Client { client })
+        }
+
+        pub fn database(&self, name: impl AsRef<str>) -> Result<Database, UrlError> {
+            let client = self.client.join(name)?;
+            Ok(Database::new(client))
+        }
+    }
 }
 
-impl Client {
-    pub fn new(url: impl AsRef<str>) -> Result<Self, Error> {
-        let client = InnerClient::new(url)?;
+pub mod r#async {
 
-        Ok(Client { client })
+    use crate::database::r#async::Database;
+    use crate::inner_client::r#async::InnerClient;
+    use crate::{Error, UrlError};
+
+    pub struct Client {
+        client: InnerClient,
     }
 
-    pub fn database(&self, name: impl AsRef<str>) -> Result<Database, UrlError> {
-        let client = self.client.join(name)?;
-        Ok(Database::new(client))
+    impl Client {
+        pub fn new(url: impl AsRef<str>) -> Result<Self, Error> {
+            let client = InnerClient::new(url)?;
+
+            Ok(Client { client })
+        }
+
+        pub fn database(&self, name: impl AsRef<str>) -> Result<Database, UrlError> {
+            let client = self.client.join(name)?;
+            Ok(Database::new(client))
+        }
     }
+
 }
