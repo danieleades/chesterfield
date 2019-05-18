@@ -40,6 +40,10 @@ pub(crate) mod sync {
         pub fn delete(&self) -> reqwest::RequestBuilder {
             self.http_client.delete(self.url.clone())
         }
+
+        pub fn head(&self) -> reqwest::RequestBuilder {
+            self.http_client.head(self.url.clone())
+        }
     }
 }
 
@@ -84,6 +88,10 @@ pub(crate) mod r#async {
 
         pub fn delete(&self) -> reqwest::r#async::RequestBuilder {
             self.http_client.delete(self.url.clone())
+        }
+
+        pub fn head(&self) -> reqwest::r#async::RequestBuilder {
+            self.http_client.head(self.url.clone())
         }
 
         pub fn duplicate(&self) -> InnerClient {

@@ -12,6 +12,7 @@ pub mod sync {
         update::sync::UpdateRequest,
     };
     use crate::inner_client::sync::InnerClient;
+    use crate::Error;
     use serde::Serialize;
 
     pub struct Database {
@@ -21,6 +22,19 @@ pub mod sync {
     impl Database {
         pub(crate) fn new(client: InnerClient) -> Self {
             Database { client }
+        }
+
+        /// Check whether the database exists
+        pub fn exists(&self) -> Result<bool, Error> {
+            self.client
+                .head()
+                .send()
+                .map(|response| match response.status().as_u16() {
+                    200 => true,
+                    404 => false,
+                    _ => unreachable!(),
+                })
+                .map_err(Error::from)
         }
 
         pub fn get(&self, id: impl Into<String>) -> GetRequest {
@@ -56,7 +70,9 @@ pub mod r#async {
         update::r#async::UpdateRequest,
     };
     use crate::inner_client::r#async::InnerClient;
+    use crate::Error;
     use serde::Serialize;
+    use tokio::prelude::Future;
 
     /// Interface for interacting with a specific CouchDB database within a CouchDB node.
     ///
@@ -77,6 +93,19 @@ pub mod r#async {
     impl Database {
         pub(crate) fn new(client: InnerClient) -> Self {
             Database { client }
+        }
+
+        /// Check whether the database exists
+        pub fn exists(&self) -> impl Future<Item = bool, Error = Error> {
+            self.client
+                .head()
+                .send()
+                .map(|response| match response.status().as_u16() {
+                    200 => true,
+                    404 => false,
+                    _ => unreachable!(),
+                })
+                .map_err(Error::from)
         }
 
         /// Retrieve a document from a database.
