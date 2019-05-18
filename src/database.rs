@@ -58,6 +58,18 @@ pub mod r#async {
     use crate::inner_client::r#async::InnerClient;
     use serde::Serialize;
 
+    /// Interface for interacting with a specific CouchDB database within a CouchDB node.
+    /// 
+    /// # Example
+    /// ```
+    /// use chesterfield::r#async::Client;
+    /// 
+    /// let couchdb_url = "https://localhost:5984";
+    /// let db = "collection";
+    /// 
+    /// let client = Client::new(couchdb_url).unwrap();
+    /// let database = client.database(db).unwrap();
+    /// ```
     pub struct Database {
         client: InnerClient,
     }
@@ -67,6 +79,22 @@ pub mod r#async {
             Database { client }
         }
 
+        /// Retrieve a document from a database.
+        /// 
+        /// # Example
+        /// ```
+        /// use chesterfield::r#async::Client;
+        /// 
+        /// let couchdb_url = "https://localhost:5984";
+        /// let db = "collection";
+        /// let document_id = "some-unique-id";
+        /// 
+        /// let client = Client::new(couchdb_url).unwrap();
+        /// let database = client.database(db).unwrap();
+        /// 
+        /// let get_request = database.get(document_id);
+        /// 
+        /// ```
         pub fn get(&self, id: impl Into<String>) -> GetRequest {
             GetRequest::new(&self.client, id)
         }

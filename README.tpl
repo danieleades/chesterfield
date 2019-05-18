@@ -16,6 +16,12 @@ cargo test
 ```
 >*"sham-wow!"*
 
+## Viewing Documentation
+```bash
+cargo doc --open
+```
+>*"kersplash!"*
+
 ## Contributing
 ```bash
 cargo contribute

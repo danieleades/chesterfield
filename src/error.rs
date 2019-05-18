@@ -1,35 +1,43 @@
 pub use reqwest::UrlError;
 
 #[derive(Debug)]
-pub enum Error {
+/// A catch-all error type for everything that can (and does, currently)
+/// go wrong with this library
+pub enum ChesterfieldError {
+    
+    /// An error reported by the underlying reqwest library.
     Reqwest(reqwest::Error),
+
+    /// An error related to the parsing of a URL.
     Url(reqwest::UrlError),
 }
 
-impl From<reqwest::Error> for Error {
+impl From<reqwest::Error> for ChesterfieldError {
     fn from(e: reqwest::Error) -> Self {
-        Error::Reqwest(e)
+        ChesterfieldError::Reqwest(e)
     }
 }
 
-impl From<reqwest::UrlError> for Error {
+impl From<reqwest::UrlError> for ChesterfieldError {
     fn from(e: reqwest::UrlError) -> Self {
-        Error::Url(e)
+        ChesterfieldError::Url(e)
     }
 }
 
-impl std::error::Error for Error {
+impl std::error::Error for ChesterfieldError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
-            Error::Reqwest(e) => Some(e),
-            Error::Url(e) => Some(e),
+            ChesterfieldError::Reqwest(e) => Some(e),
+            ChesterfieldError::Url(e) => Some(e),
         }
     }
 }
 
-impl std::fmt::Display for Error {
-    // TODO
+impl std::fmt::Display for ChesterfieldError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "chesterfield error")
+        match self {
+            ChesterfieldError::Reqwest(e) => write!(f, "reqwest error: {}", e),
+            ChesterfieldError::Url(e) => write!(f, "url error: {}", e),
+        }
     }
 }

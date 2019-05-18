@@ -59,28 +59,31 @@
 
 #![allow(unknown_lints)]
 #![warn(clippy::all)]
+#![warn(missing_docs)]
 
 mod client;
 mod database;
 mod error;
 mod inner_client;
 
-// asynchronous components
+/// the async module contains all the types which are specific
+/// to the *asynchronous* (non-blocking) API.
 pub mod r#async {
     pub use crate::client::r#async::Client;
     pub use crate::database::r#async::{Database, GetRequest, InsertRequest, UpdateRequest};
 }
 
-// synchronous components
+/// The sync module contains all the types which are specific
+/// to the *synchronous* (blocking) API.
 pub mod sync {
     pub use crate::client::sync::Client;
     pub use crate::database::sync::{Database, GetRequest};
 }
 
-// common components
+// common objects
 pub use crate::{
     database::{GetResponse, InsertResponse},
-    error::Error,
+    error::ChesterfieldError as Error,
 };
 pub use reqwest::Url;
 pub use reqwest::UrlError;
