@@ -12,6 +12,7 @@ license = "Apache-2.0"
 
 [badges]
 travis-ci = { repository = "danieleades/chesterfield" }
+maintenance = { status="actively-developed" }
 
 [dependencies]
 serde = { version = "1.0.91", features = ["derive"] }

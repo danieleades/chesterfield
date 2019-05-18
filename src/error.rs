@@ -4,7 +4,6 @@ pub use reqwest::UrlError;
 /// A catch-all error type for everything that can (and does, currently)
 /// go wrong with this library
 pub enum ChesterfieldError {
-    
     /// An error reported by the underlying reqwest library.
     Reqwest(reqwest::Error),
 

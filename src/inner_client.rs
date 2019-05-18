@@ -29,11 +29,10 @@ pub(crate) mod sync {
             self.http_client.get(self.url.clone())
         }
 
-        
         pub fn post(&self) -> reqwest::RequestBuilder {
             self.http_client.post(self.url.clone())
         }
-        
+
         pub fn put(&self) -> reqwest::RequestBuilder {
             self.http_client.put(self.url.clone())
         }

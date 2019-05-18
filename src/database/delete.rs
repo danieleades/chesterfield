@@ -65,9 +65,7 @@ pub mod r#async {
             }
         }
 
-        pub fn send(
-            self,
-        ) -> impl Future<Item = DeleteResponse, Error = Error> {
+        pub fn send(self) -> impl Future<Item = DeleteResponse, Error = Error> {
             result(self.client.join(&self.id).map_err(Error::from))
                 .and_then(move |client| {
                     client
