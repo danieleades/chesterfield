@@ -1,11 +1,15 @@
+mod delete;
 mod get;
 mod insert;
 mod update;
-pub use self::{get::GetResponse, insert::InsertResponse, update::UpdateResponse};
+pub use self::{
+    delete::DeleteResponse, get::GetResponse, insert::InsertResponse, update::UpdateResponse,
+};
 
 pub mod sync {
     pub use super::{
-        get::sync::GetRequest, insert::sync::InsertRequest, update::sync::UpdateRequest,
+        delete::sync::DeleteRequest, get::sync::GetRequest, insert::sync::InsertRequest,
+        update::sync::UpdateRequest,
     };
     use crate::inner_client::sync::InnerClient;
     use serde::Serialize;
@@ -39,12 +43,17 @@ pub mod sync {
         ) -> UpdateRequest<T> {
             UpdateRequest::new(&self.client, document, id, rev)
         }
+
+        pub fn delete(&self, id: impl Into<String>, rev: impl Into<String>) -> DeleteRequest {
+            DeleteRequest::new(&self.client, id, rev)
+        }
     }
 }
 
 pub mod r#async {
     pub use super::{
-        get::r#async::GetRequest, insert::r#async::InsertRequest, update::r#async::UpdateRequest,
+        delete::r#async::DeleteRequest, get::r#async::GetRequest, insert::r#async::InsertRequest,
+        update::r#async::UpdateRequest,
     };
     use crate::inner_client::r#async::InnerClient;
     use serde::Serialize;
@@ -77,6 +86,10 @@ pub mod r#async {
             rev: impl Into<String>,
         ) -> UpdateRequest<T> {
             UpdateRequest::new(&self.client, document, id, rev)
+        }
+
+        pub fn delete(&self, id: impl Into<String>, rev: impl Into<String>) -> DeleteRequest {
+            DeleteRequest::new(&self.client, id, rev)
         }
     }
 }

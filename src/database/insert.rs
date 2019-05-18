@@ -38,7 +38,7 @@ pub mod sync {
         pub fn send(self) -> Result<InsertResponse, Error> {
             let response = self
                 .client
-                .get()
+                .post()
                 .json(&self.payload)
                 .query(&self.query)
                 .send()?
