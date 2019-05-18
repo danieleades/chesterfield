@@ -89,4 +89,4 @@ cargo contribute
 
 Current version: 0.0.0
 
-License: apache-2.0
+License: Apache-2.0

@@ -8,7 +8,7 @@ keywords = ["couchdb", "nosql", "database", "pouchdb", "couchbase"]
 categories = ["api-bindings", "asynchronous", "database", "database-implementations"]
 authors = ["Daniel Eades <danieleades@hotmail.com>"]
 edition = "2018"
-license = "apache-2.0"
+license = "Apache-2.0"
 
 [badges]
 travis-ci = { repository = "danieleades/chesterfield" }
