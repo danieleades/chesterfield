@@ -44,6 +44,10 @@ pub(crate) mod sync {
         pub fn head(&self) -> reqwest::RequestBuilder {
             self.http_client.head(self.url.clone())
         }
+
+        pub fn url(&self) -> &Url {
+            &self.url
+        }
     }
 }
 

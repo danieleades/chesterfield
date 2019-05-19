@@ -24,7 +24,7 @@ pub mod sync {
         }
 
         pub fn database(&self, name: impl AsRef<str>) -> Result<Database, UrlError> {
-            let client = self.client.join(name)?;
+            let client = self.client.join(format!("{}/", name.as_ref()))?;
             Ok(Database::new(client))
         }
     }
@@ -48,7 +48,7 @@ pub mod r#async {
         }
 
         pub fn database(&self, name: impl AsRef<str>) -> Result<Database, UrlError> {
-            let client = self.client.join(name)?;
+            let client = self.client.join(format!("{}/", name.as_ref()))?;
             Ok(Database::new(client))
         }
     }

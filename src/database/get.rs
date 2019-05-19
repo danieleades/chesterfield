@@ -7,6 +7,7 @@ pub mod sync {
     use crate::inner_client::sync::InnerClient;
     use crate::Error;
     use serde::de::DeserializeOwned;
+    use log::{trace, info, debug, warn, error};
 
     pub struct GetRequest<'a> {
         id: String,
@@ -24,11 +25,17 @@ pub mod sync {
         }
 
         pub fn send<T: DeserializeOwned>(self) -> Result<GetResponse<T>, Error> {
-            let response = self
+            println!("get request base url: {}", self.client.url());
+            println!("joined url: {}", self.client.url().join(&self.id).unwrap());
+            let request = self
                 .client
                 .join(&self.id)?
                 .get()
-                .query(&self.query)
+                .query(&self.query);
+
+                println!("sending request: {:?}", request);
+
+                let response = request
                 .send()?
                 .json()?;
             Ok(response)
@@ -109,20 +116,27 @@ impl Default for GetRequestQuery {
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct GetResponseMeta {
     pub _id: String,
     pub _rev: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub _deleted: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub _attachments: Option<Value>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub _conflicts: Option<Vec<Value>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub _deleted_conflicts: Option<Vec<Value>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub _local_seq: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub _revs_info: Option<Vec<Value>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub _revisions: Option<Value>,
 }
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct GetResponse<T = Value> {
     #[serde(flatten)]
     pub document: T,

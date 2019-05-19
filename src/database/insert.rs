@@ -109,7 +109,7 @@ pub struct InsertRequestQuery {
     batch: Option<String>,
 }
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct InsertResponse {
     pub id: String,
     pub ok: bool,

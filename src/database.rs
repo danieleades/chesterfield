@@ -24,10 +24,18 @@ pub mod sync {
             Database { client }
         }
 
+        pub fn create(&self) -> Result<(), Error> {
+            let response = self.client.put().send()?;
+            println!("{:?}", response);
+            Ok(())
+        }
+
         /// Check whether the database exists
         pub fn exists(&self) -> Result<bool, Error> {
-            self.client
-                .head()
+            let request = self.client.head();
+            println!("{:#?}", request);
+
+            request
                 .send()
                 .map(|response| match response.status().as_u16() {
                     200 => true,
@@ -95,10 +103,16 @@ pub mod r#async {
             Database { client }
         }
 
+        pub fn create(&self) -> impl Future<Item=(), Error=Error> {
+            self.client.put().send().map(|_| ()).map_err(Error::from)
+        }
+
         /// Check whether the database exists
         pub fn exists(&self) -> impl Future<Item = bool, Error = Error> {
-            self.client
-                .head()
+            let request = self.client.head();
+            println!("{:#?}", request);
+
+            request
                 .send()
                 .map(|response| match response.status().as_u16() {
                     200 => true,
