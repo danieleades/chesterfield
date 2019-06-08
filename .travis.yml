@@ -5,7 +5,10 @@ rust:
   - stable
   - beta
   - nightly
+before_script:
+  - rustup component add rustfmt
 script:
+  - cargo fmt -- --check
   - cargo build --verbose --features container
   - cargo test --verbose --features container
 matrix:

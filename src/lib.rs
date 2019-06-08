@@ -6,9 +6,9 @@
 //!
 //! This is still in active development, in the sense that I add things when I need them, and fix bugs when they affect
 //! me directly.
-//! 
+//!
 //! Until this gets slightly closer to stable the updates to the release on Crates.io will be a lot more sporadic than the github updates.
-//! 
+//!
 //! Would be thrilled to have a couple more sets of eyes and keyboards chipping away at this. climb aboard.
 
 #![allow(unknown_lints)]
