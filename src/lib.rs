@@ -5,57 +5,11 @@
 //! Couldn't find a decent, maintained CouchDB client in Rust. Also I wanted async. So i rolled my own.
 //!
 //! This is still in active development, in the sense that I add things when I need them, and fix bugs when they affect
-//! me directly. Would be thrilled to have a couple more sets of eyes and keyboards chipping away at this. climb aboard.
-//!
-//! ## Synchronous
-//!
-//! ```rust
-//! use chesterfield::{Error, sync::Client, GetResponse};
-//! use serde::Deserialize;
-//!
-//! // use your own concrete types
-//! #[derive(Deserialize)]
-//! struct MyConcreteStruct {}
-//!
-//! let client = Client::new("https://localhost:5984").unwrap();
-//! let database =  client.database("items").unwrap();
-//! let doc_id = "some_unique_id";
-//!
-//! match database
-//!     .get(doc_id)
-//!     .send()
-//!     .map(GetResponse::<MyConcreteStruct>::into_inner) {
-//!     Ok(my_struct) => (), // do something with struct
-//!     Err(e) => println!("{}", e),
-//! }
-//!
-//! ```
-//!
-//! ## Asynchronous ("ooh fancy")
-//! ```rust
-//! use chesterfield::{Error, r#async::Client, GetResponse};
-//! use serde::Deserialize;
-//! use tokio::prelude::Future;
-//!
-//! #[derive(Deserialize)]
-//! struct MyConcreteStruct {}
-//!
-//! let client = Client::new("https://localhost:5984").unwrap();
-//! let database =  client.database("items").unwrap();
-//! let doc_id = "some_unique_id".to_string();
-//!
-//! let fut = database
-//!     .get(doc_id)
-//!     .send()
-//!     .map(GetResponse::into_inner)
-//!     .map(| document: MyConcreteStruct | {
-//!         // do something with your struct
-//!         })
-//!     .map_err(|e| println!("{}", e));
-//!
-//! tokio::run(fut);
-//!
-//! ```
+//! me directly.
+//! 
+//! Until this gets slightly closer to stable the updates to the release on Crates.io will be a lot more sporadic than the github updates.
+//! 
+//! Would be thrilled to have a couple more sets of eyes and keyboards chipping away at this. climb aboard.
 
 #![allow(unknown_lints)]
 #![warn(clippy::all)]
@@ -68,10 +22,8 @@ mod inner_client;
 
 /// the async module contains all the types which are specific
 /// to the *asynchronous* (non-blocking) API.
-pub mod r#async {
-    pub use crate::client::r#async::Client;
-    pub use crate::database::r#async::{Database, GetRequest, InsertRequest, UpdateRequest};
-}
+pub use crate::client::r#async::Client;
+pub use crate::database::r#async::{Database, GetRequest, InsertRequest, UpdateRequest};
 
 /// The sync module contains all the types which are specific
 /// to the *synchronous* (blocking) API.
@@ -88,10 +40,7 @@ pub use crate::{
 pub use reqwest::Url;
 pub use reqwest::UrlError;
 
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
-}
+#[cfg(feature = "container")]
+mod container;
+#[cfg(feature = "container")]
+pub use container::CouchDbContainer;

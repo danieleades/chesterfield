@@ -7,12 +7,15 @@ pub mod sync {
     use crate::Error;
     use serde::Serialize;
 
+    /// A request to insert a document into a CouchDB database.
+    ///
+    /// The request is lazy- it won't do anything until you call its 'send' method.
     pub struct InsertRequest<'a, T>
     where
         T: Serialize,
     {
-        client: &'a InnerClient,
-        payload: InsertPayload<T>,
+        client: InnerClient,
+        payload: InsertPayload<'a, T>,
         query: InsertRequestQuery,
     }
 
@@ -21,12 +24,12 @@ pub mod sync {
         T: Serialize,
     {
         pub(crate) fn new(
-            client: &'a InnerClient,
-            document: T,
+            client: &InnerClient,
+            document: &'a T,
             id: impl Into<Option<String>>,
         ) -> Self {
             InsertRequest {
-                client,
+                client: client.duplicate(),
                 payload: InsertPayload {
                     _id: id.into(),
                     payload: document,
@@ -57,22 +60,23 @@ pub mod r#async {
     use serde::Serialize;
     use tokio::prelude::Future;
 
-    pub struct InsertRequest<T>
+    /// A Request to insert a document into the database
+    pub struct InsertRequest<'a, T>
     where
         T: Serialize,
     {
         client: InnerClient,
-        payload: InsertPayload<T>,
+        payload: InsertPayload<'a, T>,
         query: InsertRequestQuery,
     }
 
-    impl<T> InsertRequest<T>
+    impl<'a, T> InsertRequest<'a, T>
     where
         T: Serialize,
     {
         pub(crate) fn new(
             client: &InnerClient,
-            document: T,
+            document: &'a T,
             id: impl Into<Option<String>>,
         ) -> Self {
             InsertRequest {
@@ -85,6 +89,9 @@ pub mod r#async {
             }
         }
 
+        /// Consume the request and send it to the database.
+        ///
+        /// Returns a future that resolves to an InsertResponse.
         pub fn send(self) -> impl Future<Item = InsertResponse, Error = Error> {
             self.client
                 .post()
@@ -98,10 +105,12 @@ pub mod r#async {
 }
 
 #[derive(Serialize)]
-pub struct InsertPayload<T> {
+pub struct InsertPayload<'a, T> {
     #[serde(skip_serializing_if = "Option::is_none")]
     _id: Option<String>,
-    payload: T,
+
+    #[serde(flatten)]
+    payload: &'a T,
 }
 
 #[derive(Serialize, Clone, Default)]
@@ -109,9 +118,15 @@ pub struct InsertRequestQuery {
     batch: Option<String>,
 }
 
+/// Reponse from the CouchDB database after inserting a document
 #[derive(Debug, Deserialize)]
 pub struct InsertResponse {
+    /// The _id of the inserted document
     pub id: String,
+
+    /// Insert operation status
     pub ok: bool,
+
+    /// The current revision of the inserted document
     pub rev: String,
 }

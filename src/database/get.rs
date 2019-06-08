@@ -7,8 +7,11 @@ pub mod sync {
     use crate::inner_client::sync::InnerClient;
     use crate::Error;
     use serde::de::DeserializeOwned;
-    use log::{trace, info, debug, warn, error};
 
+    /// A request to retrieve a document from a CouchDB database.
+    ///
+    /// The request is lazy- it doesn't do a thing until you call its '[send](GetRequest::send)'
+    /// method.
     pub struct GetRequest<'a> {
         id: String,
         client: &'a InnerClient,
@@ -24,20 +27,19 @@ pub mod sync {
             }
         }
 
+        /// Send the request.
+        ///
+        /// This will consume the 'get' request and return a [GetResponse](GetResponse).
+        /// The response is generic, so occasionally you might need type annotations.
         pub fn send<T: DeserializeOwned>(self) -> Result<GetResponse<T>, Error> {
             println!("get request base url: {}", self.client.url());
             println!("joined url: {}", self.client.url().join(&self.id).unwrap());
-            let request = self
-                .client
-                .join(&self.id)?
-                .get()
-                .query(&self.query);
+            let request = self.client.join(&self.id)?.get().query(&self.query);
 
-                println!("sending request: {:?}", request);
+            println!("sending request: {:#?}", request);
 
-                let response = request
-                .send()?
-                .json()?;
+            let response = request.send()?.json()?;
+
             Ok(response)
         }
     }
@@ -52,6 +54,10 @@ pub mod r#async {
     use serde::de::DeserializeOwned;
     use tokio::prelude::{future::result, Future};
 
+    /// A request to retrieve a document from a CouchDB database.
+    ///
+    /// The request is lazy- it doesn't do a thing until you call its '[send](GetRequest::send)'
+    /// method.
     pub struct GetRequest {
         id: String,
         client: InnerClient,
@@ -67,6 +73,10 @@ pub mod r#async {
             }
         }
 
+        /// Send the request.
+        ///
+        /// This will consume the 'get' request and return a [GetResponse](GetResponse).
+        /// The response is generic, so occasionally you might need type annotations.
         pub fn send<T: DeserializeOwned>(
             self,
         ) -> impl Future<Item = GetResponse<T>, Error = Error> {
@@ -120,33 +130,59 @@ impl Default for GetRequestQuery {
 pub struct GetResponseMeta {
     pub _id: String,
     pub _rev: String,
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub _deleted: Option<bool>,
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub _attachments: Option<Value>,
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub _conflicts: Option<Vec<Value>>,
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub _deleted_conflicts: Option<Vec<Value>>,
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub _local_seq: Option<String>,
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub _revs_info: Option<Vec<Value>>,
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub _revisions: Option<Value>,
 }
 
+/// A response from a GetRequest.
+///
+/// The response is generic over a type parameter T. You can use this
+/// to strongly type the response. Alternatively you can use the
+/// default generic parameter of serde_json::Value, which can represent
+/// any valid response from the database.
+///
+/// The GetResponse implements Deref with respect to the returned document.
+/// You can also consume the response and retrieve the document with the [into_inner](GetResponse::into_inner)
+/// method.
 #[derive(Debug, Deserialize)]
 pub struct GetResponse<T = Value> {
     #[serde(flatten)]
-    pub document: T,
+    document: Option<T>,
 
     #[serde(flatten)]
-    pub metadata: GetResponseMeta,
+    meta_data: GetResponseMeta,
 }
 
 impl<T> GetResponse<T> {
-    pub fn into_inner(self) -> T {
+    /// Return metadata about the response.
+    ///
+    /// Which metadata is available will depend on the options set
+    /// in the request.
+    pub fn meta_data(&self) -> &GetResponseMeta {
+        &self.meta_data
+    }
+
+    /// Consume the response and return the contained document
+    pub fn into_inner(self) -> Option<T> {
         self.document
     }
 }

@@ -37,7 +37,7 @@ match database
 
 ### Asynchronous ("ooh fancy")
 ```rust
-use chesterfield::{Error, r#async::Client, GetResponse};
+use chesterfield::{Error, Client, GetResponse};
 use serde::Deserialize;
 use tokio::prelude::Future;
 
@@ -69,7 +69,7 @@ cargo build
 
 ## Running Tests
 ```bash
-cargo test
+cargo test --features container
 ```
 >*"sham-wow!"*
 

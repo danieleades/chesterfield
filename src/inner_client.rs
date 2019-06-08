@@ -45,6 +45,13 @@ pub(crate) mod sync {
             self.http_client.head(self.url.clone())
         }
 
+        pub fn duplicate(&self) -> InnerClient {
+            InnerClient {
+                url: self.url.clone(),
+                http_client: Arc::clone(&self.http_client),
+            }
+        }
+
         pub fn url(&self) -> &Url {
             &self.url
         }

@@ -12,7 +12,7 @@ cargo build
 
 ## Running Tests
 ```bash
-cargo test
+cargo test --features container
 ```
 >*"sham-wow!"*
 

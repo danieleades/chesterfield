@@ -11,9 +11,9 @@ pub mod sync {
     where
         T: Serialize,
     {
-        client: &'a InnerClient,
+        client: InnerClient,
         _id: String,
-        payload: UpdatePayload<T>,
+        payload: UpdatePayload<'a, T>,
     }
 
     impl<'a, T> UpdateRequest<'a, T>
@@ -21,13 +21,13 @@ pub mod sync {
         T: Serialize,
     {
         pub(crate) fn new(
-            client: &'a InnerClient,
-            document: T,
+            client: &InnerClient,
+            document: &'a T,
             id: impl Into<String>,
             rev: impl Into<String>,
         ) -> Self {
             UpdateRequest {
-                client,
+                client: client.duplicate(),
                 _id: id.into(),
                 payload: UpdatePayload {
                     _rev: rev.into(),
@@ -58,22 +58,23 @@ pub mod r#async {
     use serde::Serialize;
     use tokio::prelude::{future::result, Future};
 
-    pub struct UpdateRequest<T>
+    /// A request to update an existing document.
+    pub struct UpdateRequest<'a, T>
     where
         T: Serialize,
     {
         client: InnerClient,
         _id: String,
-        payload: UpdatePayload<T>,
+        payload: UpdatePayload<'a, T>,
     }
 
-    impl<T> UpdateRequest<T>
+    impl<'a, T> UpdateRequest<'a, T>
     where
         T: Serialize,
     {
         pub(crate) fn new(
             client: &InnerClient,
-            document: T,
+            document: &'a T,
             id: impl Into<String>,
             rev: impl Into<String>,
         ) -> Self {
@@ -87,7 +88,7 @@ pub mod r#async {
             }
         }
 
-        pub fn send(self) -> impl Future<Item = UpdateResponse, Error = Error> {
+        pub fn send(self) -> impl Future<Item = UpdateResponse, Error = Error> + 'a {
             result(self.client.join(&self._id).map_err(Error::from))
                 .and_then(move |client| {
                     client.put().json(&self.payload).send().map_err(Error::from)
@@ -99,11 +100,11 @@ pub mod r#async {
 }
 
 #[derive(Serialize)]
-pub struct UpdatePayload<T> {
+pub struct UpdatePayload<'a, T> {
     _rev: String,
 
     #[serde(flatten)]
-    payload: T,
+    payload: &'a T,
 }
 
 #[derive(Deserialize)]
