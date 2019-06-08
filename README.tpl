@@ -1,4 +1,5 @@
 {{badges}}
+[![Latest Docs](https://docs.rs/chesterfield/badge.svg)](https://docs.rs/chesterfield/)
 
 # {{crate}}
 

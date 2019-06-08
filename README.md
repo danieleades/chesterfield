@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/danieleades/chesterfield.svg?branch=master)](https://travis-ci.org/danieleades/chesterfield)
+[![Latest Docs](https://docs.rs/chesterfield/badge.svg)](https://docs.rs/chesterfield/)
 
 # chesterfield
 
@@ -41,6 +42,6 @@ cargo contribute
 
 ---
 
-Current version: 0.0.0
+Current version: 0.0.1
 
 License: Apache-2.0
