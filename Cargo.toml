@@ -1,7 +1,7 @@
 [package]
 name = "chesterfield"
 description = "Ergonomic, strongly-typed CouchDB client in pure Rust."
-version = "0.0.1"
+version = "0.0.2"
 homepage = "https://github.com/danieleades/chesterfield"
 readme = "README.md"
 keywords = ["couchdb", "nosql", "database", "pouchdb", "couchbase"]
