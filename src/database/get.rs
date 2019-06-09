@@ -3,7 +3,7 @@ use serde_json::Value;
 
 pub mod sync {
 
-    use super::{GetRequestQuery, GetResponse};
+    use super::{GetRequestQuery, GetResponse, OpenRevs};
     use crate::inner_client::sync::InnerClient;
     use crate::Error;
     use serde::de::DeserializeOwned;
@@ -27,6 +27,116 @@ pub mod sync {
             }
         }
 
+        /// Includes attachments bodies in response.
+        ///
+        /// Default is false.
+        pub fn attachments(mut self, value: bool) -> Self {
+            self.query.attachments = value;
+            self
+        }
+
+        /// Includes attachment encoding information in response.
+        ///
+        /// Default is false.
+        pub fn attachment_encoding_info(mut self, value: bool) -> Self {
+            self.query.att_encoding_info = value;
+            self
+        }
+
+        /// Includes only the attachments since the specified revisions.
+        /// Doesn’t include attachments for specified revisions
+        ///
+        /// Default is false.
+        pub fn attachments_since(mut self, revisions: impl Into<Vec<String>>) -> Self {
+            self.query.atts_since = revisions.into();
+            self
+        }
+
+        /// Includes information about conflicts in document.
+        ///
+        /// Default is false.
+        pub fn conflicts(mut self, value: bool) -> Self {
+            self.query.conflicts = value;
+            self
+        }
+
+        /// Includes information about deleted conflict revisions.
+        ///
+        /// Default is false
+        pub fn deleted_conflicts(mut self, value: bool) -> Self {
+            self.query.deleted_conflicts = value;
+            self
+        }
+
+        /// Forces retrieving latest 'leaf' revision, no matter which revision
+        /// was requested.
+        ///
+        /// Default is false.
+        pub fn latest(mut self, value: bool) -> Self {
+            self.query.latest = value;
+            self
+        }
+
+        /// Includes last 'update sequence' for this document.
+        ///
+        /// The update sequence is specific to this node (in the case
+        /// of a cluster of CouchDB nodes).
+        ///
+        /// Default is false.
+        pub fn local_sequence(mut self, value: bool) -> Self {
+            self.query.local_seq = value;
+            self
+        }
+
+        /// This is the same as setting all of 'conflicts',
+        /// 'deleted_conflicts', and 'revisions_info' to true.
+        ///
+        /// Default is false.
+        pub fn meta(mut self, value: bool) -> Self {
+            self.query.meta = value;
+            self
+        }
+
+        /// retrieve documents of specified leaf revisions.
+        pub fn open_revisions(mut self, revisions: impl Into<Vec<String>>) -> Self {
+            self.query.open_revs = Some(OpenRevs::Revisions(revisions.into()));
+            self
+        }
+
+        /// retrieve documents of all leaf revisions.
+        ///
+        /// Default is false.
+        pub fn all_open_revisions(mut self, value: bool) -> Self {
+            if value {
+                self.query.open_revs = Some(OpenRevs::All("all"));
+            } else {
+                self.query.open_revs = None
+            }
+            self
+        }
+
+        /// retrieve document of specified revision.
+        pub fn revision(mut self, revision: impl Into<Option<String>>) -> Self {
+            self.query.rev = revision.into();
+            self
+        }
+
+        /// Retrieve list of known document revisions.
+        ///
+        /// Default is false.
+        pub fn revisions(mut self, value: bool) -> Self {
+            self.query.revs = value;
+            self
+        }
+
+        /// included detailed information for all know document revisions.
+        ///
+        /// Default is false.
+        pub fn revisions_info(mut self, value: bool) -> Self {
+            self.query.revs_info = value;
+            self
+        }
+
         /// Send the request.
         ///
         /// This will consume the 'get' request and return a [GetResponse](GetResponse).
@@ -48,7 +158,7 @@ pub mod sync {
 
 pub mod r#async {
 
-    use super::{GetRequestQuery, GetResponse};
+    use super::{GetRequestQuery, GetResponse, OpenRevs};
     use crate::inner_client::r#async::InnerClient;
     use crate::Error;
     use serde::de::DeserializeOwned;
@@ -58,6 +168,9 @@ pub mod r#async {
     ///
     /// The request is lazy- it doesn't do a thing until you call its '[send](GetRequest::send)'
     /// method.
+    ///
+    /// see [CouchDB API docs](https://docs.couchdb.org/en/stable/api/document/common.html#get--db-docid)
+    /// for details.
     pub struct GetRequest {
         id: String,
         client: InnerClient,
@@ -71,6 +184,116 @@ pub mod r#async {
                 client: client.duplicate(),
                 query: GetRequestQuery::default(),
             }
+        }
+
+        /// Includes attachments bodies in response.
+        ///
+        /// Default is false.
+        pub fn attachments(mut self, value: bool) -> Self {
+            self.query.attachments = value;
+            self
+        }
+
+        /// Includes attachment encoding information in response.
+        ///
+        /// Default is false.
+        pub fn attachment_encoding_info(mut self, value: bool) -> Self {
+            self.query.att_encoding_info = value;
+            self
+        }
+
+        /// Includes only the attachments since the specified revisions.
+        /// Doesn’t include attachments for specified revisions
+        ///
+        /// Default is false.
+        pub fn attachments_since(mut self, revisions: impl Into<Vec<String>>) -> Self {
+            self.query.atts_since = revisions.into();
+            self
+        }
+
+        /// Includes information about conflicts in document.
+        ///
+        /// Default is false.
+        pub fn conflicts(mut self, value: bool) -> Self {
+            self.query.conflicts = value;
+            self
+        }
+
+        /// Includes information about deleted conflict revisions.
+        ///
+        /// Default is false
+        pub fn deleted_conflicts(mut self, value: bool) -> Self {
+            self.query.deleted_conflicts = value;
+            self
+        }
+
+        /// Forces retrieving latest 'leaf' revision, no matter which revision
+        /// was requested.
+        ///
+        /// Default is false.
+        pub fn latest(mut self, value: bool) -> Self {
+            self.query.latest = value;
+            self
+        }
+
+        /// Includes last 'update sequence' for this document.
+        ///
+        /// The update sequence is specific to this node (in the case
+        /// of a cluster of CouchDB nodes).
+        ///
+        /// Default is false.
+        pub fn local_sequence(mut self, value: bool) -> Self {
+            self.query.local_seq = value;
+            self
+        }
+
+        /// This is the same as setting all of 'conflicts',
+        /// 'deleted_conflicts', and 'revisions_info' to true.
+        ///
+        /// Default is false.
+        pub fn meta(mut self, value: bool) -> Self {
+            self.query.meta = value;
+            self
+        }
+
+        /// retrieve documents of specified leaf revisions.
+        pub fn open_revisions(mut self, revisions: impl Into<Vec<String>>) -> Self {
+            self.query.open_revs = Some(OpenRevs::Revisions(revisions.into()));
+            self
+        }
+
+        /// retrieve documents of all leaf revisions.
+        ///
+        /// Default is false.
+        pub fn all_open_revisions(mut self, value: bool) -> Self {
+            if value {
+                self.query.open_revs = Some(OpenRevs::All("all"));
+            } else {
+                self.query.open_revs = None
+            }
+            self
+        }
+
+        /// retrieve document of specified revision.
+        pub fn revision(mut self, revision: impl Into<Option<String>>) -> Self {
+            self.query.rev = revision.into();
+            self
+        }
+
+        /// Retrieve list of known document revisions.
+        ///
+        /// Default is false.
+        pub fn revisions(mut self, value: bool) -> Self {
+            self.query.revs = value;
+            self
+        }
+
+        /// included detailed information for all know document revisions.
+        ///
+        /// Default is false.
+        pub fn revisions_info(mut self, value: bool) -> Self {
+            self.query.revs_info = value;
+            self
         }
 
         /// Send the request.
@@ -92,19 +315,26 @@ pub mod r#async {
 pub struct GetRequestQuery {
     attachments: bool,
     att_encoding_info: bool,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    atts_since: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    atts_since: Vec<String>,
     conflicts: bool,
     deleted_conflicts: bool,
     latest: bool,
     local_seq: bool,
     meta: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
-    open_revs: Option<Vec<String>>,
+    open_revs: Option<OpenRevs>,
     #[serde(skip_serializing_if = "Option::is_none")]
     rev: Option<String>,
     revs: bool,
     revs_info: bool,
+}
+
+#[derive(Serialize, Clone, Debug)]
+#[serde(untagged)]
+enum OpenRevs {
+    Revisions(Vec<String>),
+    All(&'static str),
 }
 
 impl Default for GetRequestQuery {
@@ -112,7 +342,7 @@ impl Default for GetRequestQuery {
         GetRequestQuery {
             attachments: false,
             att_encoding_info: false,
-            atts_since: None,
+            atts_since: Vec::default(),
             conflicts: false,
             deleted_conflicts: false,
             latest: false,
