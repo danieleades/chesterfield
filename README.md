@@ -3,6 +3,8 @@
 
 # chesterfield
 
+**This project is in a holding pattern pending the tokio and reqwest libraries moving to futures 0.3**
+
 An ergonomic, strongly typed CouchDB client in Rust.
 
 This library includes both synchronous and asynchronous APIs for the programmer who wants to have it all.
