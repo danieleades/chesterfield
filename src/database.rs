@@ -45,7 +45,7 @@ impl Database {
     /// use futures::future::{FutureExt, TryFutureExt};
     /// use tokio;
     /// # use couchdb_container::CouchDbContainer;
-    /// 
+    ///
     /// let future03 = async {
     /// # {
     ///     // Create the CouchDB client
@@ -55,19 +55,19 @@ impl Database {
     /// # let couchdb = CouchDbContainer::new().await;
     /// # let url = format!("http://localhost:{}", couchdb.port());
     /// # let client = Client::new(url).unwrap();
-    /// 
+    ///
     ///     // create a client for a specific database
     ///     let database = client.database("items").unwrap();
-    /// 
+    ///
     ///     // create the database in the remote CouchDB instance
     ///     database.create().await.expect("unable to create database!");
     /// #
     /// # couchdb.delete().await;
     /// };
-    /// 
+    ///
     /// // Currently, we must convert 0.3 future to 0.1 future to run on tokio executor
     /// let future01 = future03.unit_error().boxed().compat();
-    /// 
+    ///
     /// tokio::run(future01);
     /// ```
     pub async fn create(&self) -> Result<(), Error> {
