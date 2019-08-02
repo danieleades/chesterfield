@@ -14,16 +14,13 @@ license = "Apache-2.0"
 travis-ci = { repository = "danieleades/chesterfield" }
 maintenance = { status="actively-developed" }
 
-[features]
-container = ["harbourmaster"]
-
 [dependencies]
-serde = { version = "1.0.92", features = ["derive"] }
-serde_json = "1.0.39"
-reqwest = "0.9.18"
-tokio = "0.1.21"
-log = "0.4.6"
-harbourmaster = { version = "0.1.0", optional = true }
+serde = { version = "1.0.97", features = ["derive"] }
+serde_json = "1.0.40"
+reqwest = "0.9.19"
+log = "0.4.7"
+futures-preview = { version = "0.3.0-alpha.14", features = ["compat"] }
 
 [dev-dependencies]
-shiplift = "0.5.0"
+couchdb-container = "0.1.0"
+tokio = "0.1.22"
