@@ -3,13 +3,10 @@
 
 # chesterfield
 
-**This project is in a holding pattern pending the tokio and reqwest libraries moving to futures 0.3**
-
-An ergonomic, strongly typed CouchDB client in Rust.
-
-This library includes both synchronous and asynchronous APIs for the programmer who wants to have it all.
+An ergonomic, strongly typed, asynchronous CouchDB client in Rust.
 
 [see the documentation](https://docs.rs/chesterfield/0.0.1/chesterfield/)
+
 *(note that the docs.rs documentation might be lagging behind master)*
 
 Couldn't find a decent, maintained CouchDB client in Rust. Also I wanted async. So i rolled my own.
