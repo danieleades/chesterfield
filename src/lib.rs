@@ -15,12 +15,10 @@
 #![warn(clippy::all)]
 #![warn(missing_docs)]
 #![feature(async_await)]
-#![feature(doc_cfg)]
 
 mod client;
 mod database;
 mod error;
-mod inner_client;
 
 pub use crate::client::Client;
 pub use crate::database::{Database, GetRequest, InsertRequest, UpdateRequest};

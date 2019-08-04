@@ -7,7 +7,7 @@ mod update;
 pub use self::{
     delete::DeleteRequest, get::GetRequest, insert::InsertRequest, update::UpdateRequest,
 };
-use crate::{inner_client::InnerClient, Error};
+use crate::{client::Client, Error};
 use futures::compat::Future01CompatExt;
 use serde::Serialize;
 
@@ -20,15 +20,15 @@ use serde::Serialize;
 /// let couchdb_url = "https://localhost:5984";
 /// let db = "collection";
 ///
-/// let client = Client::new(couchdb_url).unwrap();
+/// let client = Client::from_url_str(couchdb_url).unwrap();
 /// let database = client.database(db).unwrap();
 /// ```
 pub struct Database {
-    client: InnerClient,
+    client: Client,
 }
 
 impl Database {
-    pub(crate) fn new(client: InnerClient) -> Self {
+    pub(crate) fn new(client: Client) -> Self {
         Database { client }
     }
 
@@ -42,19 +42,19 @@ impl Database {
     /// ```
     /// # #![feature(async_await)]
     /// use chesterfield::Client;
-    /// use futures::future::{FutureExt, TryFutureExt};
     /// use tokio;
     /// # use couchdb_container::CouchDbContainer;
     ///
     /// let future03 = async {
     /// # {
+    ///     # // pretend we're pointing at default port (it's actually randomised)
     ///     // Create the CouchDB client
-    ///     let client = Client::new("http://localhost:5984").unwrap();
+    ///     let client = Client::from_url_str("http://localhost:5984").unwrap();
     /// # }
-    /// #
-    /// # let couchdb = CouchDbContainer::new().await;
+    /// # // Create the actual CouchDB instance
+    /// # let couchdb = CouchDbContainer::new().await.unwrap();
     /// # let url = format!("http://localhost:{}", couchdb.port());
-    /// # let client = Client::new(url).unwrap();
+    /// # let client = Client::from_url_str(url).unwrap();
     ///
     ///     // create a client for a specific database
     ///     let database = client.database("items").unwrap();
@@ -62,10 +62,12 @@ impl Database {
     ///     // create the database in the remote CouchDB instance
     ///     database.create().await.expect("unable to create database!");
     /// #
+    /// # // Clean up CouchDB instance
     /// # couchdb.delete().await;
     /// };
     ///
     /// // Currently, we must convert 0.3 future to 0.1 future to run on tokio executor
+    /// use futures::future::{FutureExt, TryFutureExt};
     /// let future01 = future03.unit_error().boxed().compat();
     ///
     /// tokio::run(future01);
@@ -105,7 +107,7 @@ impl Database {
     /// let db = "collection";
     /// let document_id = "some-unique-id";
     ///
-    /// let client = Client::new(couchdb_url).unwrap();
+    /// let client = Client::from_url_str(couchdb_url).unwrap();
     /// let database = client.database(db).unwrap();
     ///
     /// let get_request = database.get(document_id);
@@ -123,10 +125,11 @@ impl Database {
     /// (but you might not like it). The response will contain the ID and the revision.
     ///
     /// # Example
-    /// ```rust,ignore
-    /// # use chesterfield::Client;
-    /// # use serde::Serialize;
-    /// # use tokio::prelude::Future;
+    /// ```
+    /// # #![feature(async_await)]
+    /// use chesterfield::Client;
+    /// # use couchdb_container::CouchDbContainer;
+    /// use serde::Serialize;
     ///
     /// #[derive(Serialize)]
     /// struct MyCoolStruct {
@@ -134,40 +137,39 @@ impl Database {
     ///     field2: u32,
     /// }
     ///
-    /// let doc = MyCoolStruct {
-    ///     field1: String::from("some string"),
-    ///     field2: 42,
-    /// };
+    /// async fn app() {
+    /// #    {
+    /// #       // pretend we're pointing at default port (it's actually randomised)
+    ///     // Create the CouchDB client
+    ///     let client = Client::from_url_str("http://localhost:5984").unwrap();
+    /// #    }
+    /// #    // Create the actual CouchDB instance
+    /// #    let couchdb = CouchDbContainer::new().await.unwrap();
+    /// #    let url = format!("http://localhost:{}", couchdb.port());
+    /// #    let client = Client::from_url_str(url).unwrap();
     ///
-    /// # {
-    /// #     let client = Client::new("http://localhost:5984").unwrap();
-    /// # }
+    ///     // create a client for a specific database
+    ///     let database = client.database("items").unwrap();
     ///
-    /// # use chesterfield::CouchDbContainer;
-    /// # let couchdb = CouchDbContainer::default();
-    /// # let url = format!("http://localhost:{}", couchdb.port());
-    /// # let client = Client::new(url).unwrap();
-    ///     
-    /// # // Create the database client
-    /// # let database = client.database("items").unwrap();
-    /// #     
-    /// # tokio::run(
-    /// #     // ensure the database exists in the remote
-    /// #     database.create().map_err(|e| panic!("{}", e)),
-    /// # );
-    ///     
-    /// tokio::run(
-    ///     database
-    ///         // insert document into database
-    ///         .insert(&doc, None)
-    ///         .send()
-    ///         // do something with the response
-    ///         .map(|response| assert!(response.ok))
-    ///         // handle any errors
-    ///         .map_err(|e| panic!("{}", e)),
-    /// );
-    ///     
-    /// # couchdb.delete();
+    ///     // create the database in the remote CouchDB instance
+    ///     database.create().await.expect("unable to create database!");
+    ///
+    ///     let doc = MyCoolStruct {
+    ///         field1: String::from("some string"),
+    ///         field2: 42,
+    ///     };
+    ///
+    ///     database.insert(&doc, None).send().await.unwrap();
+    /// #
+    /// #    // Clean up CouchDB instance
+    /// #    couchdb.delete().await.unwrap();
+    /// }
+    ///
+    /// // Currently, we must convert 0.3 future to 0.1 future to run on tokio executor
+    /// use futures::future::{FutureExt, TryFutureExt};
+    /// let future01 = app().unit_error().boxed().compat();
+    ///
+    /// tokio::run(future01);
     /// ```
     pub fn insert<'a, T: Serialize>(
         &self,
@@ -241,6 +243,7 @@ impl Database {
         UpdateRequest::new(&self.client, document, id, rev)
     }
 
+    /// Delete an existing document in the database.
     pub fn delete(&self, id: impl Into<String>, rev: impl Into<String>) -> DeleteRequest {
         DeleteRequest::new(&self.client, id, rev)
     }

@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::inner_client::InnerClient;
+use crate::client::Client;
 use crate::Error;
 use futures::compat::Future01CompatExt;
 
@@ -9,7 +9,7 @@ pub struct UpdateRequest<'a, T>
 where
     T: Serialize,
 {
-    client: InnerClient,
+    client: Client,
     _id: String,
     payload: UpdatePayload<'a, T>,
 }
@@ -19,13 +19,13 @@ where
     T: Serialize,
 {
     pub(crate) fn new(
-        client: &InnerClient,
+        client: &Client,
         document: &'a T,
         id: impl Into<String>,
         rev: impl Into<String>,
     ) -> Self {
         UpdateRequest {
-            client: client.duplicate(),
+            client: client.into(),
             _id: id.into(),
             payload: UpdatePayload {
                 _rev: rev.into(),
@@ -34,6 +34,7 @@ where
         }
     }
 
+    /// Consume the update request and send it to the remote
     pub async fn send(self) -> Result<UpdateResponse, Error> {
         let response = self
             .client

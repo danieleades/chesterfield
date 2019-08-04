@@ -1,20 +1,20 @@
 use serde::{Deserialize, Serialize};
 
-use crate::inner_client::InnerClient;
+use crate::client::Client;
 use crate::Error;
 use futures::compat::Future01CompatExt;
 
 pub struct DeleteRequest {
     id: String,
-    client: InnerClient,
+    client: Client,
     query: DeleteRequestQuery,
 }
 
 impl DeleteRequest {
-    pub(crate) fn new(client: &InnerClient, id: impl Into<String>, rev: impl Into<String>) -> Self {
+    pub(crate) fn new(client: &Client, id: impl Into<String>, rev: impl Into<String>) -> Self {
         DeleteRequest {
             id: id.into(),
-            client: client.duplicate(),
+            client: client.into(),
             query: DeleteRequestQuery::new(rev),
         }
     }

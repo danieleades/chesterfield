@@ -1,15 +1,14 @@
-use serde::{Deserialize, Serialize};
-
-use crate::inner_client::InnerClient;
+use crate::client::Client;
 use crate::Error;
 use futures::compat::Future01CompatExt;
+use serde::{Deserialize, Serialize};
 
 /// A Request to insert a document into the database
 pub struct InsertRequest<'a, T>
 where
     T: Serialize,
 {
-    client: InnerClient,
+    client: Client,
     payload: InsertPayload<'a, T>,
     query: InsertRequestQuery,
 }
@@ -18,13 +17,9 @@ impl<'a, T> InsertRequest<'a, T>
 where
     T: Serialize,
 {
-    pub(crate) fn new(
-        client: &InnerClient,
-        document: &'a T,
-        id: impl Into<Option<String>>,
-    ) -> Self {
+    pub(crate) fn new(client: &Client, document: &'a T, id: impl Into<Option<String>>) -> Self {
         InsertRequest {
-            client: client.duplicate(),
+            client: client.into(),
             payload: InsertPayload {
                 _id: id.into(),
                 payload: document,

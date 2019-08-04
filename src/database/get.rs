@@ -1,7 +1,7 @@
+use crate::client::Client;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-use crate::inner_client::InnerClient;
 use crate::Error;
 use futures::compat::Future01CompatExt;
 use serde::de::DeserializeOwned;
@@ -15,15 +15,15 @@ use serde::de::DeserializeOwned;
 /// for details.
 pub struct GetRequest {
     id: String,
-    client: InnerClient,
+    client: Client,
     query: GetRequestQuery,
 }
 
 impl GetRequest {
-    pub(crate) fn new(client: &InnerClient, id: impl Into<String>) -> Self {
+    pub(crate) fn new(client: &Client, id: impl Into<String>) -> Self {
         GetRequest {
             id: id.into(),
-            client: client.duplicate(),
+            client: client.into(),
             query: GetRequestQuery::default(),
         }
     }
@@ -262,13 +262,5 @@ impl<T> GetResponse<T> {
     /// Consume the response and return the contained document
     pub fn into_inner(self) -> Option<T> {
         self.document
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
     }
 }
