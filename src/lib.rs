@@ -1,6 +1,6 @@
 //! An ergonomic, strongly typed, asynchronous CouchDB client in Rust.
 //!
-//! [see the documentation](https://docs.rs/chesterfield/0.0.1/chesterfield/)
+//! [see the documentation](https://docs.rs/chesterfield/)
 //!
 //! *(note that the docs.rs documentation might be lagging behind master)*
 //!
@@ -9,12 +9,12 @@
 //! This is still in active development, in the sense that I add things when I need them, and fix bugs when they affect
 //! me directly.
 //!
+//! **Pull requests, feedback, and other contributions very welcome!**
 //! Would be thrilled to have a couple more sets of eyes and keyboards chipping away at this. climb aboard.
 
 #![allow(unknown_lints)]
 #![warn(clippy::all)]
 #![warn(missing_docs)]
-#![feature(async_await)]
 
 mod client;
 mod database;

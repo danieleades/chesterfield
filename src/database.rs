@@ -2,10 +2,10 @@ mod delete;
 mod get;
 mod insert;
 mod update;
-//mod replication;
+mod replicate;
 
 pub use self::{
-    delete::DeleteRequest, get::GetRequest, insert::InsertRequest, update::UpdateRequest,
+    delete::DeleteRequest, get::GetRequest, insert::InsertRequest, update::UpdateRequest, replicate::ReplicateRequest,
 };
 use crate::{client::Client, Error};
 use futures::compat::Future01CompatExt;
@@ -248,15 +248,7 @@ impl Database {
         DeleteRequest::new(&self.client, id, rev)
     }
 
-    pub fn replicate_to<S: Into<String>>(url: S) -> Result<Replication, Error> {
-        unimplemented!()
-    }
-
-    pub fn replicate_from<S: Into<String>>(url: S) -> Result<Replication, Error> {
-        unimplemented!()
-    }
-
-    pub fn replicate_sync<S: Into<String>>(url: S) -> Result<Replication, Error> {
+    pub fn replicate<S: Into<String>>(remote: S) -> ReplicateRequest {
         unimplemented!()
     }
 }

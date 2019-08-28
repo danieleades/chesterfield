@@ -1,26 +1,20 @@
 use serde::{Deserialize, Serialize};
 
-
-
-        use crate::inner_client::InnerClient;
+use crate::client::Client;
 
 pub struct ReplicateRequest {
-    client: InnerClient,
-    payload: ReplicatePayload
-}
-
-impl ReplicateRequest {
-    pub fn new(client: &InnerClient) {
-        
-    }
-}
-
-    pub struct Replication {
-    client: InnerClient,
+    client: Client,
     payload: ReplicatePayload,
 }
 
+impl ReplicateRequest {
+    pub fn new(client: &Client) {}
+}
 
+pub struct Replication {
+    client: Client,
+    payload: ReplicatePayload,
+}
 
 fn is_true(value: &bool) -> bool {
     *value
@@ -32,8 +26,7 @@ fn is_false(value: &bool) -> bool {
 
 #[derive(Serialize)]
 pub struct ReplicatePayload {
-
-    #[serde(skip_serializing_if = "is_true")]
+    #[serde(skip_serializing_if = "is_false")]
     cancel: bool,
 
     #[serde(skip_serializing_if = "is_false")]
@@ -53,4 +46,19 @@ pub struct ReplicatePayload {
 
     source: String,
     target: String,
+}
+
+impl ReplicatePayload {
+    fn new(source: String, target: String) -> Self {
+        ReplicatePayload {
+            cancel: false,
+            continuous: false,
+            create_target: false,
+            doc_ids: Vec::default(),
+            filter: None,
+            proxy: None,
+            source,
+            target,
+        }
+    }
 }
