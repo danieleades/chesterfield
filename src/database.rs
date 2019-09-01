@@ -1,11 +1,12 @@
 mod delete;
 mod get;
 mod insert;
-mod update;
 mod replicate;
+mod update;
 
 pub use self::{
-    delete::DeleteRequest, get::GetRequest, insert::InsertRequest, update::UpdateRequest, replicate::ReplicateRequest,
+    delete::DeleteRequest, get::GetRequest, insert::InsertRequest, replicate::ReplicateRequest,
+    update::UpdateRequest,
 };
 use crate::{client::Client, Error};
 use futures::compat::Future01CompatExt;
@@ -30,6 +31,11 @@ pub struct Database {
 impl Database {
     pub(crate) fn new(client: Client) -> Self {
         Database { client }
+    }
+
+    /// return the database name
+    pub fn name(&self) -> &str {
+        self.client.url().path_segments().unwrap().next().unwrap()
     }
 
     /// Create the database, if it doesn't exist.
@@ -248,9 +254,23 @@ impl Database {
         DeleteRequest::new(&self.client, id, rev)
     }
 
-    pub fn replicate<S: Into<String>>(remote: S) -> ReplicateRequest {
-        unimplemented!()
+    pub fn replicate(&self, target: impl Into<String>) -> ReplicateRequest {
+        let source = String::from(self.name());
+        ReplicateRequest::new(&self.client, target.into())
     }
 }
 
-pub struct Replication {}
+#[cfg(test)]
+mod tests {
+    use crate::Client;
+
+    #[test]
+    fn name() {
+        let database = Client::from_url_str("http://localhost:5984")
+            .unwrap()
+            .database("my_database")
+            .unwrap();
+
+        assert_eq!("my_database", database.name());
+    }
+}

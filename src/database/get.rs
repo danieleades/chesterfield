@@ -2,7 +2,7 @@ use crate::client::Client;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-use crate::Error;
+use crate::Result;
 use futures::compat::Future01CompatExt;
 use serde::de::DeserializeOwned;
 
@@ -142,7 +142,7 @@ impl GetRequest {
     ///
     /// This will consume the 'get' request and return a [GetResponse](GetResponse).
     /// The response is generic, so occasionally you might need type annotations.
-    pub async fn send<T: DeserializeOwned>(self) -> Result<GetResponse<T>, Error> {
+    pub async fn send<T: DeserializeOwned>(self) -> Result<GetResponse<T>> {
         let response = self
             .client
             .join(&self.id)?

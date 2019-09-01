@@ -24,5 +24,6 @@ pub use crate::client::Client;
 pub use crate::database::{Database, GetRequest, InsertRequest, UpdateRequest};
 
 pub use crate::error::ChesterfieldError as Error;
+pub type Result<T> = std::result::Result<T, Error>;
 pub use reqwest::Url;
 pub use reqwest::UrlError;

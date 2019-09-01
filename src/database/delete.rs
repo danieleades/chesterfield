@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::client::Client;
-use crate::Error;
+use crate::Result;
 use futures::compat::Future01CompatExt;
 
 pub struct DeleteRequest {
@@ -19,7 +19,7 @@ impl DeleteRequest {
         }
     }
 
-    pub async fn send(self) -> Result<DeleteResponse, Error> {
+    pub async fn send(self) -> Result<DeleteResponse> {
         let response = self
             .client
             // create a new client pointing at "<database>/documentId"

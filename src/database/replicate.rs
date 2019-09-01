@@ -1,6 +1,7 @@
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 
 use crate::client::Client;
+use crate::Result;
 
 pub struct ReplicateRequest {
     client: Client,
@@ -8,16 +9,24 @@ pub struct ReplicateRequest {
 }
 
 impl ReplicateRequest {
-    pub fn new(client: &Client) {}
+    pub(crate) fn new(client: impl Into<Client>, target: impl Into<String>) -> Self {
+        let client = client.into();
+        let source = client.url().path();
+        let payload = ReplicatePayload::new(source, target);
+        ReplicateRequest {
+            client: client.into(),
+            payload,
+        }
+    }
+
+    pub async fn send() -> Result<Replication> {
+        unimplemented!()
+    }
 }
 
 pub struct Replication {
     client: Client,
     payload: ReplicatePayload,
-}
-
-fn is_true(value: &bool) -> bool {
-    *value
 }
 
 fn is_false(value: &bool) -> bool {
@@ -49,7 +58,7 @@ pub struct ReplicatePayload {
 }
 
 impl ReplicatePayload {
-    fn new(source: String, target: String) -> Self {
+    fn new(source: impl Into<String>, target: impl Into<String>) -> Self {
         ReplicatePayload {
             cancel: false,
             continuous: false,
@@ -57,8 +66,8 @@ impl ReplicatePayload {
             doc_ids: Vec::default(),
             filter: None,
             proxy: None,
-            source,
-            target,
+            source: source.into(),
+            target: target.into(),
         }
     }
 }

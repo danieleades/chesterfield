@@ -1,5 +1,5 @@
 use crate::client::Client;
-use crate::Error;
+use crate::Result;
 use futures::compat::Future01CompatExt;
 use serde::{Deserialize, Serialize};
 
@@ -31,7 +31,7 @@ where
     /// Consume the request and send it to the database.
     ///
     /// Returns a future that resolves to an InsertResponse.
-    pub async fn send(self) -> Result<InsertResponse, Error> {
+    pub async fn send(self) -> Result<InsertResponse> {
         let response = self
             .client
             .post()

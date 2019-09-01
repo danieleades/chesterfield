@@ -28,6 +28,10 @@ impl Client {
         Ok(Client { url, http_client })
     }
 
+    pub fn url(&self) -> &Url {
+        &self.url
+    }
+
     /// Create a new asynchronous client from a URL string
     ///
     /// # Example

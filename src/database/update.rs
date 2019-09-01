@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::client::Client;
-use crate::Error;
+use crate::Result;
 use futures::compat::Future01CompatExt;
 
 /// A request to update an existing document.
@@ -35,7 +35,7 @@ where
     }
 
     /// Consume the update request and send it to the remote
-    pub async fn send(self) -> Result<UpdateResponse, Error> {
+    pub async fn send(self) -> Result<UpdateResponse> {
         let response = self
             .client
             .join(&self._id)?
