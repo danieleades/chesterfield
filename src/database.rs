@@ -254,9 +254,14 @@ impl Database {
         DeleteRequest::new(&self.client, id, rev)
     }
 
-    pub fn replicate(&self, target: impl Into<String>) -> ReplicateRequest {
+    pub fn replicate_to(&self, target: impl Into<String>) -> ReplicateRequest {
         let source = String::from(self.name());
-        ReplicateRequest::new(&self.client, target.into())
+        ReplicateRequest::new_push_replication(&self.client, target.into())
+    }
+
+    pub fn replicate_from(&self, target: impl Into<String>) -> ReplicateRequest {
+        let source = String::from(self.name());
+        ReplicateRequest::new_pull_replication(&self.client, target.into())
     }
 }
 

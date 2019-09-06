@@ -1,5 +1,5 @@
 use crate::database::Database;
-use crate::{Error, UrlError};
+use crate::{Error, Result, UrlError};
 use reqwest::Url;
 use std::str::FromStr;
 use std::sync::Arc;
@@ -22,7 +22,7 @@ impl Client {
     ///
     /// # Errors
     /// This method fails if the TLS backend fails to initialise
-    pub fn new(url: Url) -> Result<Self, Error> {
+    pub fn new(url: Url) -> Result<Self> {
         let http_client = Arc::new(reqwest::r#async::ClientBuilder::new().build()?);
 
         Ok(Client { url, http_client })
@@ -43,12 +43,12 @@ impl Client {
     ///
     /// # Errors
     /// This method fails if the TLS backend fails to initialise or if the URL string cannot be parsed
-    pub fn from_url_str(url: impl AsRef<str>) -> Result<Self, Error> {
+    pub fn from_url_str(url: impl AsRef<str>) -> Result<Self> {
         let url = Url::parse(url.as_ref())?;
         Client::new(url)
     }
 
-    pub(crate) fn join(&self, name: impl AsRef<str>) -> Result<Self, UrlError> {
+    pub(crate) fn join(&self, name: impl AsRef<str>) -> std::result::Result<Self, UrlError> {
         let url = self.url.join(&format!("{}/", name.as_ref()))?;
         let http_client = Arc::clone(&self.http_client);
 
@@ -65,7 +65,7 @@ impl Client {
     ///
     /// let database = client.database("some_collection").unwrap();
     /// ```
-    pub fn database(&self, name: impl AsRef<str>) -> Result<Database, UrlError> {
+    pub fn database(&self, name: impl AsRef<str>) -> std::result::Result<Database, UrlError> {
         let client = self.join(name)?;
         Ok(Database::new(client))
     }
@@ -103,7 +103,7 @@ impl From<&Client> for Client {
 impl FromStr for Client {
     type Err = Error;
 
-    fn from_str(url: &str) -> Result<Self, Self::Err> {
+    fn from_str(url: &str) -> Result<Self> {
         Client::from_url_str(url)
     }
 }

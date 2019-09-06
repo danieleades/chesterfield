@@ -9,14 +9,36 @@ pub struct ReplicateRequest {
 }
 
 impl ReplicateRequest {
-    pub(crate) fn new(client: impl Into<Client>, target: impl Into<String>) -> Self {
+    pub(crate) fn new_push_replication(
+        client: impl Into<Client>,
+        target: impl Into<String>,
+    ) -> Self {
         let client = client.into();
-        let source = client.url().path();
-        let payload = ReplicatePayload::new(source, target);
-        ReplicateRequest {
-            client: client.into(),
-            payload,
-        }
+
+        let source: String = client.url().path().into();
+        let sink = target;
+
+        ReplicateRequest::new(client, source, sink)
+    }
+
+    pub(crate) fn new_pull_replication(
+        client: impl Into<Client>,
+        target: impl Into<String>,
+    ) -> Self {
+        let client = client.into();
+
+        let source = target;
+        let sink: String = client.url().path().into();
+
+        ReplicateRequest::new(client, source, sink)
+    }
+
+    fn new(client: impl Into<Client>, source: impl Into<String>, sink: impl Into<String>) -> Self {
+        let client = client.into();
+
+        let payload = ReplicatePayload::new(source, sink);
+
+        ReplicateRequest { client, payload }
     }
 
     pub async fn send() -> Result<Replication> {
@@ -27,6 +49,12 @@ impl ReplicateRequest {
 pub struct Replication {
     client: Client,
     payload: ReplicatePayload,
+}
+
+impl Replication {
+    pub async fn cancel(&self) -> Result<()> {
+        unimplemented!()
+    }
 }
 
 fn is_false(value: &bool) -> bool {
@@ -54,11 +82,11 @@ pub struct ReplicatePayload {
     proxy: Option<String>,
 
     source: String,
-    target: String,
+    sink: String,
 }
 
 impl ReplicatePayload {
-    fn new(source: impl Into<String>, target: impl Into<String>) -> Self {
+    fn new(source: impl Into<String>, sink: impl Into<String>) -> Self {
         ReplicatePayload {
             cancel: false,
             continuous: false,
@@ -67,7 +95,7 @@ impl ReplicatePayload {
             filter: None,
             proxy: None,
             source: source.into(),
-            target: target.into(),
+            sink: sink.into(),
         }
     }
 }
