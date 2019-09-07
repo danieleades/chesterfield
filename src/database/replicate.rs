@@ -99,3 +99,20 @@ impl ReplicatePayload {
         }
     }
 }
+
+/* #[cfg(test)]
+mod tests {
+    use couchdb_container::CouchDbContainer;
+    use crate::Client;
+
+    #[tokio::test]
+    async fn replication() {
+        let source = CouchDbContainer::new().await.unwrap();
+        let source_url = format!("http://localhost:{}", source.port());
+        let source_client = Client::from_url_str(source_url).unwrap();
+
+        let sink = CouchDbContainer::new().await.unwrap();
+        let sink_url = format!("http://localhost:{}", sink.port());
+        let sink_client = Client::from_url_str(sink_url).unwrap();
+    }
+} */

@@ -255,12 +255,10 @@ impl Database {
     }
 
     pub fn replicate_to(&self, target: impl Into<String>) -> ReplicateRequest {
-        let source = String::from(self.name());
         ReplicateRequest::new_push_replication(&self.client, target.into())
     }
 
     pub fn replicate_from(&self, target: impl Into<String>) -> ReplicateRequest {
-        let source = String::from(self.name());
         ReplicateRequest::new_pull_replication(&self.client, target.into())
     }
 }
