@@ -2,13 +2,11 @@ mod delete;
 mod get;
 mod insert;
 mod update;
-//mod replication;
 
 pub use self::{
     delete::DeleteRequest, get::GetRequest, insert::InsertRequest, update::UpdateRequest,
 };
 use crate::{client::Client, Error};
-use futures::compat::Future01CompatExt;
 use serde::Serialize;
 
 /// Interface for interacting with a specific CouchDB database within a CouchDB node.
@@ -37,6 +35,24 @@ impl Database {
     /// Creating the database object itself is lazy- no check is performed
     /// that the endpoint exists. Call this method if you need to create the endpoint
     /// (or if you're not sure).
+    ///
+    /// # Example
+    /// ```no_run
+    /// use chesterfield::Client;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///
+    ///     // Create the CouchDB client
+    ///     let client = Client::from_url_str("http://localhost:5984").unwrap();
+    ///
+    ///     // Create a client for a specific database
+    ///     let database = client.database("items").unwrap();
+    ///
+    ///     // create the database in the remote CouchDB instance
+    ///     database.create().await.expect("unable to create database!");
+    /// };
+    /// ```
     ///
     /// # Example
     /// ```
@@ -76,7 +92,6 @@ impl Database {
         self.client
             .put()
             .send()
-            .compat()
             .await
             .map(|_| ())
             .map_err(Error::from)
@@ -87,7 +102,6 @@ impl Database {
         self.client
             .head()
             .send()
-            .compat()
             .await
             .map(|response| match response.status().as_u16() {
                 200 => true,
@@ -247,18 +261,4 @@ impl Database {
     pub fn delete(&self, id: impl Into<String>, rev: impl Into<String>) -> DeleteRequest {
         DeleteRequest::new(&self.client, id, rev)
     }
-
-    pub fn replicate_to<S: Into<String>>(url: S) -> Result<Replication, Error> {
-        unimplemented!()
-    }
-
-    pub fn replicate_from<S: Into<String>>(url: S) -> Result<Replication, Error> {
-        unimplemented!()
-    }
-
-    pub fn replicate_sync<S: Into<String>>(url: S) -> Result<Replication, Error> {
-        unimplemented!()
-    }
 }
-
-pub struct Replication {}

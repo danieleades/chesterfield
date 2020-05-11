@@ -2,7 +2,6 @@ use serde::{Deserialize, Serialize};
 
 use crate::client::Client;
 use crate::Error;
-use futures::compat::Future01CompatExt;
 
 pub struct DeleteRequest {
     id: String,
@@ -28,11 +27,9 @@ impl DeleteRequest {
             .delete()
             .query(&self.query)
             .send()
-            .compat()
             .await?
             // extract the JSON blob
             .json()
-            .compat()
             .await?;
         Ok(response)
     }
@@ -60,12 +57,4 @@ pub struct DeleteResponse {
     pub id: String,
     pub ok: bool,
     pub rev: String,
-}
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
 }

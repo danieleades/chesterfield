@@ -1,13 +1,14 @@
 use crate::database::Database;
-use crate::{Error, UrlError};
+use crate::Error;
 use reqwest::Url;
 use std::str::FromStr;
 use std::sync::Arc;
+use url::ParseError;
 
 /// An asynchronous CouchDB client
 pub struct Client {
     url: Url,
-    http_client: Arc<reqwest::r#async::Client>,
+    http_client: Arc<reqwest::Client>,
 }
 
 impl Client {
@@ -23,7 +24,7 @@ impl Client {
     /// # Errors
     /// This method fails if the TLS backend fails to initialise
     pub fn new(url: Url) -> Result<Self, Error> {
-        let http_client = Arc::new(reqwest::r#async::ClientBuilder::new().build()?);
+        let http_client = Arc::new(reqwest::ClientBuilder::new().build()?);
 
         Ok(Client { url, http_client })
     }
@@ -44,7 +45,7 @@ impl Client {
         Client::new(url)
     }
 
-    pub(crate) fn join(&self, name: impl AsRef<str>) -> Result<Self, UrlError> {
+    pub(crate) fn join(&self, name: impl AsRef<str>) -> Result<Self, ParseError> {
         let url = self.url.join(&format!("{}/", name.as_ref()))?;
         let http_client = Arc::clone(&self.http_client);
 
@@ -61,28 +62,28 @@ impl Client {
     ///
     /// let database = client.database("some_collection").unwrap();
     /// ```
-    pub fn database(&self, name: impl AsRef<str>) -> Result<Database, UrlError> {
+    pub fn database(&self, name: impl AsRef<str>) -> Result<Database, ParseError> {
         let client = self.join(name)?;
         Ok(Database::new(client))
     }
 
-    pub(crate) fn get(&self) -> reqwest::r#async::RequestBuilder {
+    pub(crate) fn get(&self) -> reqwest::RequestBuilder {
         self.http_client.get(self.url.clone())
     }
 
-    pub(crate) fn post(&self) -> reqwest::r#async::RequestBuilder {
+    pub(crate) fn post(&self) -> reqwest::RequestBuilder {
         self.http_client.post(self.url.clone())
     }
 
-    pub(crate) fn put(&self) -> reqwest::r#async::RequestBuilder {
+    pub(crate) fn put(&self) -> reqwest::RequestBuilder {
         self.http_client.put(self.url.clone())
     }
 
-    pub(crate) fn delete(&self) -> reqwest::r#async::RequestBuilder {
+    pub(crate) fn delete(&self) -> reqwest::RequestBuilder {
         self.http_client.delete(self.url.clone())
     }
 
-    pub(crate) fn head(&self) -> reqwest::r#async::RequestBuilder {
+    pub(crate) fn head(&self) -> reqwest::RequestBuilder {
         self.http_client.head(self.url.clone())
     }
 }

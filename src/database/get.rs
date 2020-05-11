@@ -3,7 +3,6 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 use crate::Error;
-use futures::compat::Future01CompatExt;
 use serde::de::DeserializeOwned;
 
 /// A request to retrieve a document from a CouchDB database.
@@ -149,10 +148,8 @@ impl GetRequest {
             .get()
             .query(&self.query)
             .send()
-            .compat()
             .await?
             .json()
-            .compat()
             .await?;
 
         Ok(response)

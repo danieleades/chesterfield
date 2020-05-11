@@ -14,7 +14,6 @@
 #![allow(unknown_lints)]
 #![warn(clippy::all)]
 #![warn(missing_docs)]
-#![feature(async_await)]
 
 mod client;
 mod database;
@@ -25,4 +24,3 @@ pub use crate::database::{Database, GetRequest, InsertRequest, UpdateRequest};
 
 pub use crate::error::ChesterfieldError as Error;
 pub use reqwest::Url;
-pub use reqwest::UrlError;

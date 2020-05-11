@@ -1,5 +1,3 @@
-#![feature(async_await)]
-
 use harbourmaster::{Container, Error, Protocol};
 use std::net::TcpListener;
 
