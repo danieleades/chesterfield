@@ -1,0 +1,11 @@
+[package]
+name = "couchdb-container"
+description = "A small utility library for creating CouchDB docker containers programmatically"
+version = "0.2.0"
+authors = ["Daniel Eades <danieleades@hotmail.com>"]
+edition = "2018"
+license = "Apache-2.0"
+
+[dependencies]
+shiplift = "0.5.0"
+harbourmaster = "0.3.0"

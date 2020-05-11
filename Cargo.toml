@@ -22,5 +22,5 @@ log = "0.4.8"
 futures-preview = { version = "0.3.0-alpha.14", features = ["compat"] }
 
 [dev-dependencies]
-couchdb-container = "0.2.0"
+couchdb-container = {version = "0.2.0", path = "couchdb-container" }
 tokio = "0.1.22"
