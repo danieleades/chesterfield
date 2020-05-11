@@ -1,4 +1,4 @@
-pub use reqwest::UrlError;
+pub use url::ParseError;
 
 #[derive(Debug)]
 /// A catch-all error type for everything that can (and does, currently)
@@ -8,7 +8,7 @@ pub enum ChesterfieldError {
     Reqwest(reqwest::Error),
 
     /// An error related to the parsing of a URL.
-    Url(reqwest::UrlError),
+    Url(ParseError),
 }
 
 impl From<reqwest::Error> for ChesterfieldError {
@@ -17,8 +17,8 @@ impl From<reqwest::Error> for ChesterfieldError {
     }
 }
 
-impl From<reqwest::UrlError> for ChesterfieldError {
-    fn from(e: reqwest::UrlError) -> Self {
+impl From<ParseError> for ChesterfieldError {
+    fn from(e: ParseError) -> Self {
         ChesterfieldError::Url(e)
     }
 }

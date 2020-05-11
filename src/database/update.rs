@@ -2,7 +2,6 @@ use serde::{Deserialize, Serialize};
 
 use crate::client::Client;
 use crate::Error;
-use futures::compat::Future01CompatExt;
 
 /// A request to update an existing document.
 pub struct UpdateRequest<'a, T>
@@ -42,10 +41,8 @@ where
             .put()
             .json(&self.payload)
             .send()
-            .compat()
             .await?
             .json()
-            .compat()
             .await?;
         Ok(response)
     }

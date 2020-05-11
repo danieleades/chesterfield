@@ -1,6 +1,5 @@
 use crate::client::Client;
 use crate::Error;
-use futures::compat::Future01CompatExt;
 use serde::{Deserialize, Serialize};
 
 /// A Request to insert a document into the database
@@ -38,10 +37,8 @@ where
             .json(&self.payload)
             .query(&self.query)
             .send()
-            .compat()
             .await?
             .json()
-            .compat()
             .await?;
         Ok(response)
     }
